@@ -1,5 +1,5 @@
 const mysql = require('mysql2/promise');
-
+// TODO: Do I need to have these functions return the id back to the object?
 // class takes dbConfig object as argument.
 class Department {
   constructor(dbConfig) {
@@ -11,15 +11,18 @@ class Department {
   // create new department on DB
   async create(departmentName) {
     try {
+      //
       const connection = await mysql.createConnection(this.dbConfig);
-      await connection.query('INSERT INTO department SET ?', {
+      const query = await connection.query('INSERT INTO department SET ?', {
         name: departmentName,
       });
       this.name = departmentName;
+      this.id = query[0].insertId;
       connection.end();
     } catch (error) {
       console.error(error);
     }
+    return this;
   }
 }
 

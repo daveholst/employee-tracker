@@ -9,7 +9,10 @@ const dbConfig = {
   database: 'hr_employees',
 };
 
-const newDepartment = new Department(dbConfig);
-newDepartment.create('Gardener');
-
+const tester = async () => {
+  const newDepartment = new Department(dbConfig);
+  const gardenersObj = await newDepartment.create('Gardeners');
+  console.log(gardenersObj);
+};
+tester();
 // writeEmployee('dave', 'holst', 303, 102);
