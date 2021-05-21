@@ -53,6 +53,31 @@ class Department {
       }
     }
   }
+
+  // updates a department entry - takes changes as an object
+  async update(id = this.id, dataObject) {
+    try {
+      const connection = await mysql.createConnection(this.dbConfig);
+      await connection.query('UPDATE department SET ? WHERE id=?', [
+        dataObject,
+        id,
+      ]);
+      connection.end();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // deletes a department entry
+  async delete(id = this.id) {
+    try {
+      const connection = await mysql.createConnection(this.dbConfig);
+      await connection.query(`DELETE FROM department WHERE id=${id}`);
+      connection.end();
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }
 
 module.exports = Department;
