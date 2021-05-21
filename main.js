@@ -1,4 +1,5 @@
-const mysql = require('mysql2/promise');
+// const mysql = require('mysql2/promise');
+const Department = require('./utils/department');
 
 const dbConfig = {
   host: 'localhost',
@@ -8,19 +9,7 @@ const dbConfig = {
   database: 'hr_employees',
 };
 
-const writeEmployee = async (firstName, lastName, roleID, managerID) => {
-  try {
-    const connection = await mysql.createConnection(dbConfig);
-    await connection.query('INSERT INTO employeeee SET ?', {
-      first_name: firstName,
-      last_name: lastName,
-      role_id: roleID,
-      manager_id: managerID,
-    });
-    connection.end();
-  } catch (error) {
-    console.error(error);
-  }
-};
+const newDepartment = new Department(dbConfig);
+newDepartment.create('Gardener');
 
-writeEmployee('dave', 'holst', 303, 102);
+// writeEmployee('dave', 'holst', 303, 102);
