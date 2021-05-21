@@ -24,6 +24,35 @@ class Department {
     }
     return this;
   }
+
+  // reads a row based on id, if no id returns all
+  async read(id) {
+    // if no args, get all
+    if (id === undefined) {
+      try {
+        const connection = await mysql.createConnection(this.dbConfig);
+        const query = await connection.query('SELECT * FROM department');
+        connection.end();
+        return query[0];
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      try {
+        //
+        const connection = await mysql.createConnection(this.dbConfig);
+        const query = await connection.query(
+          `SELECT * FROM department WHERE id = ${id}`
+        );
+        this.id = query[0][0].id;
+        this.name = query[0][0].name;
+        connection.end();
+        return query[0];
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
 }
 
 module.exports = Department;
