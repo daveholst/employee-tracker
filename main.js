@@ -4,28 +4,24 @@ const inquirer = require('inquirer');
 const Department = require('./utils/departmentClass');
 const { topLevelPrompt } = require('./utils/prompts');
 
-const dbConfig = {
-  host: 'localhost',
-  port: 6606,
-  user: 'dave',
-  password: 'password',
-  database: 'hr_employees',
-};
+// const dbConfig = {
+//   host: 'localhost',
+//   port: 6606,
+//   user: 'dave',
+//   password: 'password',
+//   database: 'hr_employees',
+// };
 
-const printEmployees = () => {
-  console.log('i printed');
-};
-// initial selection
+// const printEmployees = () => {
+//   console.log('i printed');
+// };
+// // initial selection
 
-const init = async (task) => {
-  if (!task) {
-    // generate top level prompts
+const init = async () => {
+  try {
     const topLevelResponse = await topLevelPrompt.generate();
-    // genereate next level of prompts based on answer/response
-    const secondLevelResponse = await topLevelPrompt.next(topLevelResponse);
-    if (secondLevelResponse.task === 'back') init();
-  } else {
-    const answers = { task };
+  } catch (error) {
+    console.error(error);
   }
 };
 

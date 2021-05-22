@@ -54,11 +54,10 @@ const topLevelPrompt = {
         },
       ],
     });
-    return answers;
+    this.next(answers);
   },
   async next(answers) {
     // switch to detect single function operations. (View)
-    console.log(answers);
     switch (answers.task) {
       case 'viewAll':
         // run a program to pull from print all.
@@ -80,9 +79,10 @@ const topLevelPrompt = {
         break;
       case 'manDepartment': {
         const response = await departmentPrompt.manageDepartment();
-        const nextResponse = await departmentPrompt.next(response);
-        // check if user wants to go back?
-        return nextResponse;
+        // const nextResponse = await departmentPrompt.next(response);
+        // // check if user wants to go back?
+        // return nextResponse;
+        break;
       }
       case 'manRoles':
         // run a program to print all.
@@ -119,7 +119,8 @@ const departmentPrompt = {
         },
       ],
     });
-    return answers;
+    this.next(answers);
+    // console.log(answers);
   },
 
   async next(answers) {
@@ -132,14 +133,28 @@ const departmentPrompt = {
         const answer = await this.manageDepartment();
         return answer;
       }
-      case 'addADepartment':
-        // run a program to print all.
-        break;
+      case 'addADepartment': {
+        try {
+          const answer = await inquirer.prompt({
+            type: 'input',
+            message: 'What would you like to name the Department?',
+            name: 'departmentName',
+          });
+          const newDepartment = new Department(dbConfig);
+          await newDepartment.create(answer.departmentName);
+          const answer2 = await this.manageDepartment();
+          return answer2;
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
       case 'updateDepartment':
         // run a program to print all.
         break;
       case 'back':
-        return 'back';
+        topLevelPrompt.generate();
+        break;
       default:
         console.error('Something went wrong');
     }
