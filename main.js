@@ -1,8 +1,8 @@
 // const mysql = require('mysql2/promise');
 const cTable = require('console.table');
 const inquirer = require('inquirer');
-const Department = require('./utils/department');
-const questions = require('./utils/questions');
+const Department = require('./utils/departmentClass');
+const startPrompt = require('./utils/startPagePrompt');
 
 const dbConfig = {
   host: 'localhost',
@@ -18,8 +18,12 @@ const printEmployees = () => {
 // initial selection
 
 const interface = async () => {
-  const
+  const answer = await startPrompt.startScreen();
+  await startPrompt.next(answer);
+
 }
+
+interface()
 
 // const tester = async () => {
 //   const newDepartment = new Department(dbConfig);
