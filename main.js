@@ -1,8 +1,8 @@
 // const mysql = require('mysql2/promise');
 const cTable = require('console.table');
-const { async } = require('regenerator-runtime');
-
+const inquirer = require('inquirer');
 const Department = require('./utils/department');
+const questions = require('./utils/questions');
 
 const dbConfig = {
   host: 'localhost',
@@ -11,6 +11,15 @@ const dbConfig = {
   password: 'password',
   database: 'hr_employees',
 };
+
+const printEmployees = () => {
+  console.log('i printed');
+};
+// initial selection
+
+const interface = async () => {
+  const
+}
 
 // const tester = async () => {
 //   const newDepartment = new Department(dbConfig);
@@ -30,9 +39,9 @@ const dbConfig = {
 //   const newDepartment = new Department(dbConfig);
 //   newDepartment.update(603, { name: 'wankers' });
 // };
-const tester4 = async () => {
-  const newDepartment = new Department(dbConfig);
-  newDepartment.delete(600);
-};
+// const tester4 = async () => {
+//   const newDepartment = new Department(dbConfig);
+//   newDepartment.delete(600);
+// };
 
-tester4();
+// tester4();
