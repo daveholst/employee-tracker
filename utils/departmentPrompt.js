@@ -1,7 +1,7 @@
 const cTable = require('console.table');
 const inquirer = require('inquirer');
 const Department = require('./departmentClass');
-const startPrompt = require('./startPagePrompt');
+const startPrompt = require('./prompts');
 
 const dbConfig = {
   host: 'localhost',

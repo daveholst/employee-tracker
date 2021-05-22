@@ -2,7 +2,7 @@
 const cTable = require('console.table');
 const inquirer = require('inquirer');
 const Department = require('./utils/departmentClass');
-const startPrompt = require('./utils/startPagePrompt');
+const { topLevelPrompt } = require('./utils/prompts');
 
 const dbConfig = {
   host: 'localhost',
@@ -17,12 +17,19 @@ const printEmployees = () => {
 };
 // initial selection
 
-const CLIinterface = async () => {
-  const answer = await startPrompt.startScreen();
-  await startPrompt.next(answer);
+const init = async (task) => {
+  if (!task) {
+    // generate top level prompts
+    const topLevelResponse = await topLevelPrompt.generate();
+    // genereate next level of prompts based on answer/response
+    const secondLevelResponse = await topLevelPrompt.next(topLevelResponse);
+    if (secondLevelResponse.task === 'back') init();
+  } else {
+    const answers = { task };
+  }
 };
 
-CLIinterface();
+init();
 
 // const tester = async () => {
 //   const newDepartment = new Department(dbConfig);

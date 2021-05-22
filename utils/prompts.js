@@ -1,10 +1,17 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const departmentPrompt = require('./departmentPrompt');
-const { next } = require('./departmentPrompt');
+const Department = require('./departmentClass');
 
-const startPrompt = {
-  async startScreen() {
+const dbConfig = {
+  host: 'localhost',
+  port: 6606,
+  user: 'dave',
+  password: 'password',
+  database: 'hr_employees',
+};
+
+const topLevelPrompt = {
+  async generate() {
     const answers = await inquirer.prompt({
       type: 'list',
       message: 'What would you like to do?',
@@ -75,10 +82,7 @@ const startPrompt = {
         const response = await departmentPrompt.manageDepartment();
         const nextResponse = await departmentPrompt.next(response);
         // check if user wants to go back?
-        if (nextResponse === 'back') this.startScreen();
-
-        // run a program to print all.
-        break;
+        return nextResponse;
       }
       case 'manRoles':
         // run a program to print all.
@@ -90,4 +94,56 @@ const startPrompt = {
   },
 };
 
-module.exports = startPrompt;
+const departmentPrompt = {
+  async manageDepartment() {
+    const answers = await inquirer.prompt({
+      type: 'list',
+      message: 'What would you like to do with Departments?',
+      name: 'task',
+      choices: [
+        {
+          name: 'View All Departments',
+          value: 'viewAllDepartments',
+        },
+        {
+          name: 'Add a Department',
+          value: 'addADepartment',
+        },
+        {
+          name: 'Update Department',
+          value: 'updateDepartment',
+        },
+        {
+          name: 'Back',
+          value: 'back',
+        },
+      ],
+    });
+    return answers;
+  },
+
+  async next(answers) {
+    switch (answers.task) {
+      case 'viewAllDepartments': {
+        // run a program to pull from print all.
+        const newDepartment = new Department(dbConfig);
+        const allDepartments = await newDepartment.read();
+        console.table(allDepartments);
+        const answer = await this.manageDepartment();
+        return answer;
+      }
+      case 'addADepartment':
+        // run a program to print all.
+        break;
+      case 'updateDepartment':
+        // run a program to print all.
+        break;
+      case 'back':
+        return 'back';
+      default:
+        console.error('Something went wrong');
+    }
+  },
+};
+
+module.exports = { topLevelPrompt, departmentPrompt };
