@@ -17,13 +17,12 @@ const printEmployees = () => {
 };
 // initial selection
 
-const interface = async () => {
+const CLIinterface = async () => {
   const answer = await startPrompt.startScreen();
   await startPrompt.next(answer);
+};
 
-}
-
-interface()
+CLIinterface();
 
 // const tester = async () => {
 //   const newDepartment = new Department(dbConfig);

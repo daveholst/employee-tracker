@@ -1,6 +1,7 @@
 const cTable = require('console.table');
 const inquirer = require('inquirer');
 const Department = require('./departmentClass');
+const startPrompt = require('./startPagePrompt');
 
 const dbConfig = {
   host: 'localhost',
@@ -29,6 +30,10 @@ const departmentPrompt = {
           name: 'Update Department',
           value: 'updateDepartment',
         },
+        {
+          name: 'Back',
+          value: 'back',
+        },
       ],
     });
     console.log(answers);
@@ -42,6 +47,7 @@ const departmentPrompt = {
         const newDepartment = new Department(dbConfig);
         const allDepartments = await newDepartment.read();
         console.table(allDepartments);
+        this.manageDepartment();
         break;
       }
       case 'addADepartment':
@@ -50,6 +56,8 @@ const departmentPrompt = {
       case 'updateDepartment':
         // run a program to print all.
         break;
+      case 'back':
+        return 'back';
       default:
         console.error('Something went wrong');
     }

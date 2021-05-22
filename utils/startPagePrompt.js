@@ -1,9 +1,10 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const departmentPrompt = require('./departmentPrompt');
+const { next } = require('./departmentPrompt');
 
 const startPrompt = {
-  startScreen: async () => {
+  async startScreen() {
     const answers = await inquirer.prompt({
       type: 'list',
       message: 'What would you like to do?',
@@ -48,7 +49,7 @@ const startPrompt = {
     });
     return answers;
   },
-  next: async (answers) => {
+  async next(answers) {
     // switch to detect single function operations. (View)
     console.log(answers);
     switch (answers.task) {
@@ -72,7 +73,9 @@ const startPrompt = {
         break;
       case 'manDepartment': {
         const response = await departmentPrompt.manageDepartment();
-        departmentPrompt.next(response);
+        const nextResponse = await departmentPrompt.next(response);
+        // check if user wants to go back?
+        if (nextResponse === 'back') this.startScreen();
 
         // run a program to print all.
         break;
