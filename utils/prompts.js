@@ -110,8 +110,12 @@ const departmentPrompt = {
           value: 'addADepartment',
         },
         {
-          name: 'Update Department',
+          name: 'Update a Department',
           value: 'updateDepartment',
+        },
+        {
+          name: 'Delete a Department',
+          value: 'deleteDepartment',
         },
         {
           name: 'Back',
@@ -149,14 +153,58 @@ const departmentPrompt = {
           break;
         }
       }
-      case 'updateDepartment':
-        // run a program to print all.
-        break;
+      case 'updateDepartment': {
+        try {
+          const newDepartment = new Department(dbConfig);
+          const questions = {
+            type: 'list',
+            message: 'Which Department would you like to delete?',
+            name: 'departmentID',
+            choices: undefined,
+          };
+          const choices = await newDepartment.listAll();
+          questions.choices = choices;
+          const answer = await inquirer.prompt(questions);
+          const answer2 = await inquirer.prompt({
+            type: 'input',
+            message:
+              'What is the new Name for the Department? (Enter to not Change)',
+            name: 'departmentName',
+          });
+          await newDepartment.delete(answer.departmentID);
+          const answer3 = await this.manageDepartment();
+          return answer3;
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
+      case 'deleteDepartment': {
+        try {
+          const newDepartment = new Department(dbConfig);
+          const questions = {
+            type: 'list',
+            message: 'Which Department would you like to delete?',
+            name: 'departmentID',
+            choices: undefined,
+          };
+          const choices = await newDepartment.listAll();
+          questions.choices = choices;
+          const answer = await inquirer.prompt(questions);
+          await newDepartment.delete(answer.departmentID);
+          const answer2 = await this.manageDepartment();
+          return answer2;
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
+
       case 'back':
         topLevelPrompt.generate();
         break;
       default:
-        console.error('Something went wrong');
+        console.error('Something went wrong in selection');
     }
   },
 };

@@ -1,3 +1,4 @@
+const { result } = require('lodash');
 const mysql = require('mysql2/promise');
 // TODO: Do I need to have these functions return the id back to the object?
 // class takes dbConfig object as argument.
@@ -77,6 +78,26 @@ class Department {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  // generate inquirer list
+  async listAll() {
+    try {
+      const connection = await mysql.createConnection(this.dbConfig);
+      const allDepartments = await connection.query('SELECT * FROM department');
+      const choices = [];
+      allDepartments[0].forEach((department) => {
+        const choice = {
+          name: department.name,
+          value: department.id,
+        };
+        choices.push(choice);
+      });
+      return choices;
+    } catch (error) {
+      console.error(error);
+    }
+    // loop results to build inquirer
   }
 }
 

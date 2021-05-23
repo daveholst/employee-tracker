@@ -1,22 +1,17 @@
 // const mysql = require('mysql2/promise');
 const cTable = require('console.table');
 const inquirer = require('inquirer');
+const { all } = require('prelude-ls');
 const Department = require('./utils/departmentClass');
 const { topLevelPrompt } = require('./utils/prompts');
 
-// const dbConfig = {
-//   host: 'localhost',
-//   port: 6606,
-//   user: 'dave',
-//   password: 'password',
-//   database: 'hr_employees',
-// };
-
-// const printEmployees = () => {
-//   console.log('i printed');
-// };
-// // initial selection
-
+const dbConfig = {
+  host: 'localhost',
+  port: 6606,
+  user: 'dave',
+  password: 'password',
+  database: 'hr_employees',
+};
 const init = async () => {
   try {
     const topLevelResponse = await topLevelPrompt.generate();
@@ -24,8 +19,13 @@ const init = async () => {
     console.error(error);
   }
 };
-
 init();
+// const tester = async () => {
+//   const newDepartment = new Department(dbConfig);
+//   const allDepartments = await newDepartment.listAll();
+//   console.log(allDepartments);
+// };
+// tester();
 
 // const tester = async () => {
 //   const newDepartment = new Department(dbConfig);
