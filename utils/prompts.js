@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const Department = require('./departmentClass');
+const Role = require('./roleClass');
 
 const dbConfig = {
   host: 'localhost',
@@ -78,13 +79,14 @@ const topLevelPrompt = {
         // run a program to print all.
         break;
       case 'manDepartment': {
-        const response = await departmentPrompt.manageDepartment();
+        await departmentPrompt.manageDepartment();
         // const nextResponse = await departmentPrompt.next(response);
         // // check if user wants to go back?
         // return nextResponse;
         break;
       }
       case 'manRoles':
+        await rolePrompt.manageRoles();
         // run a program to print all.
         break;
       default:
@@ -159,27 +161,181 @@ const departmentPrompt = {
           const questions = {
             type: 'list',
             message: 'Which Department would you like to delete?',
-            name: 'departmentID',
+            name: 'ID',
             choices: undefined,
           };
           const choices = await newDepartment.listAll();
           questions.choices = choices;
-          const answer = await inquirer.prompt(questions);
-          const answer2 = await inquirer.prompt({
+          const IdAnswer = await inquirer.prompt(questions);
+          const newNameAnswer = await inquirer.prompt({
             type: 'input',
             message:
-              'What is the new Name for the Department? (Enter to not Change)',
-            name: 'departmentName',
+              'What is the new name for the Department? (Enter to not Change)',
+            name: 'newName',
           });
-          await newDepartment.delete(answer.departmentID);
-          const answer3 = await this.manageDepartment();
-          return answer3;
+          if (newNameAnswer.newName === '') {
+            return await this.manageDepartment();
+          }
+          await newDepartment.update(IdAnswer.ID, {
+            name: newNameAnswer.newName,
+          });
+          return await this.manageDepartment();
         } catch (error) {
           console.error(error);
           break;
         }
       }
       case 'deleteDepartment': {
+        try {
+          const newDepartment = new Department(dbConfig);
+          const questions = {
+            type: 'list',
+            message: 'Which Department would you like to delete?',
+            name: 'departmentID',
+            choices: undefined,
+          };
+          const choices = await newDepartment.listAll();
+          questions.choices = choices;
+          const answer = await inquirer.prompt(questions);
+          await newDepartment.delete(answer.departmentID);
+          const answer2 = await this.manageDepartment();
+          return answer2;
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
+
+      case 'back':
+        topLevelPrompt.generate();
+        break;
+      default:
+        console.error('Something went wrong in selection');
+    }
+  },
+};
+
+const rolePrompt = {
+  async manageRoles() {
+    const answers = await inquirer.prompt({
+      type: 'list',
+      message: 'What would you like to do with Roles?',
+      name: 'task',
+      choices: [
+        {
+          name: 'View All Roles',
+          value: 'viewAllRoles',
+        },
+        {
+          name: 'Add a Role',
+          value: 'addARole',
+        },
+        {
+          name: 'Update a Role',
+          value: 'updateRole',
+        },
+        {
+          name: 'Delete a Role',
+          value: 'deleteRole',
+        },
+        {
+          name: 'Back',
+          value: 'back',
+        },
+      ],
+    });
+    this.next(answers);
+    // console.log(answers);
+  },
+
+  async next(answers) {
+    switch (answers.task) {
+      case 'viewAllRoles': {
+        // run a program to pull from print all.
+        const newRole = new Role(dbConfig);
+        const allRoles = await newRole.read();
+        console.table(allRoles);
+        const answer = await this.manageRoles();
+        return answer;
+      }
+      case 'addARole': {
+        try {
+          const questions = [
+            {
+              type: 'input',
+              message: 'What is the title of the new Role?',
+              name: 'roleTitle',
+            },
+            {
+              type: 'input',
+              message: 'What is the salary of the Role? (ex. 100000.00)?',
+              name: 'roleSalary',
+            },
+            {
+              type: 'list',
+              message: 'Which Department does the Role belong to?',
+              name: 'roleDepartment',
+              choices: undefined,
+            },
+          ];
+          // get department inquirer questions array
+          const newDepartment = new Department(dbConfig);
+          const departmentChoices = await newDepartment.listAll();
+          questions[2].choices = departmentChoices;
+          const answer = await inquirer.prompt(questions);
+          console.log(answer);
+          const newRole = new Role(dbConfig);
+          await newRole.create(
+            answer.roleTitle,
+            answer.roleSalary,
+            answer.roleDepartment
+          );
+          const answer2 = await this.manageRoles();
+          return answer2;
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
+      case 'updateRole': {
+        try {
+          const newRole = new Role(dbConfig);
+          const questions = {
+            type: 'list',
+            message: 'Which Role would you like to delete?',
+            name: 'ID',
+            choices: undefined,
+          };
+          const choices = await newRole.listAll();
+          questions.choices = choices;
+          const IdAnswer = await inquirer.prompt(questions);
+          const newNameAnswer = await inquirer.prompt([
+            {
+              type: 'input',
+              message:
+                'What is the new name for the Role? (Enter to not Change)',
+              name: 'newName',
+            },
+            {
+              type: 'input',
+              message:
+                'What is the new name for the Department? (Enter to not Change)',
+              name: 'newName',
+            },
+          ]);
+          if (newNameAnswer.newName === '') {
+            return await this.manageDepartment();
+          }
+          await newDepartment.update(IdAnswer.ID, {
+            name: newNameAnswer.newName,
+          });
+          return await this.manageDepartment();
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
+      case 'deleteRole': {
         try {
           const newDepartment = new Department(dbConfig);
           const questions = {

@@ -1,20 +1,26 @@
 const mysql = require('mysql2/promise');
 // class takes dbConfig object as argument.
-class Department {
+class Role {
   constructor(dbConfig) {
     this.id = undefined;
-    this.name = undefined;
+    this.title = undefined;
+    this.salary = undefined;
+    this.department_id = undefined;
     this.dbConfig = dbConfig;
   }
 
   // create new department on DB
-  async create(departmentName) {
+  async create(roleTitle, salaryAmnt, departmentID) {
     try {
       const connection = await mysql.createConnection(this.dbConfig);
-      const query = await connection.query('INSERT INTO department SET ?', {
-        department_name: departmentName,
+      const query = await connection.query('INSERT INTO roles SET ?', {
+        title: roleTitle,
+        salary: salaryAmnt,
+        department_id: departmentID,
       });
-      this.name = departmentName;
+      this.title = roleTitle;
+      this.salary = salaryAmnt;
+      this.department_id = departmentID;
       this.id = query[0].insertId;
       connection.end();
     } catch (error) {
@@ -29,7 +35,10 @@ class Department {
     if (id === undefined) {
       try {
         const connection = await mysql.createConnection(this.dbConfig);
-        const query = await connection.query('SELECT * FROM department');
+        const query = await connection.query(
+          `SELECT roles.id,roles.title,roles.salary,department_id,department_name
+          FROM roles JOIN department WHERE department_id = department.id`
+        );
         connection.end();
         return query[0];
       } catch (error) {
@@ -39,7 +48,7 @@ class Department {
       try {
         const connection = await mysql.createConnection(this.dbConfig);
         const query = await connection.query(
-          `SELECT * FROM department WHERE id = ${id}`
+          `SELECT * FROM roles WHERE id = ${id}`
         );
         this.id = query[0][0].id;
         this.name = query[0][0].name;
@@ -80,12 +89,12 @@ class Department {
   async listAll() {
     try {
       const connection = await mysql.createConnection(this.dbConfig);
-      const allDepartments = await connection.query('SELECT * FROM department');
+      const allDepartments = await connection.query('SELECT * FROM roles');
       const choices = [];
       // loop results to build inquirer questions object
       allDepartments[0].forEach((department) => {
         const choice = {
-          name: department.department_name,
+          name: department.name,
           value: department.id,
         };
         choices.push(choice);
@@ -97,4 +106,4 @@ class Department {
   }
 }
 
-module.exports = Department;
+module.exports = Role;
