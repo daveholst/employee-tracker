@@ -368,11 +368,11 @@ const rolePrompt = {
             name: 'departmentID',
             choices: undefined,
           };
-          const choices = await newDepartment.listAll();
+          const choices = await newRole.listAll();
           questions.choices = choices;
           const answer = await inquirer.prompt(questions);
-          await newDepartment.delete(answer.departmentID);
-          const answer2 = await this.manageDepartment();
+          await newRole.delete(answer.departmentID);
+          const answer2 = await this.manageRoles();
           return answer2;
         } catch (error) {
           console.error(error);
