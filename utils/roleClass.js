@@ -64,10 +64,7 @@ class Role {
   async update(id = this.id, dataObject) {
     try {
       const connection = await mysql.createConnection(this.dbConfig);
-      await connection.query('UPDATE department SET ? WHERE id=?', [
-        dataObject,
-        id,
-      ]);
+      await connection.query('UPDATE roles SET ? WHERE id=?', [dataObject, id]);
       connection.end();
     } catch (error) {
       console.error(error);
@@ -89,13 +86,13 @@ class Role {
   async listAll() {
     try {
       const connection = await mysql.createConnection(this.dbConfig);
-      const allDepartments = await connection.query('SELECT * FROM roles');
+      const allRoles = await connection.query('SELECT * FROM roles');
       const choices = [];
       // loop results to build inquirer questions object
-      allDepartments[0].forEach((department) => {
+      allRoles[0].forEach((role) => {
         const choice = {
-          name: department.name,
-          value: department.id,
+          name: role.title,
+          value: role.id,
         };
         choices.push(choice);
       });

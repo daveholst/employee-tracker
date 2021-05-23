@@ -299,37 +299,61 @@ const rolePrompt = {
       }
       case 'updateRole': {
         try {
+          // get list of Roles to select from
           const newRole = new Role(dbConfig);
+          const newDepartment = new Department(dbConfig);
           const questions = {
             type: 'list',
-            message: 'Which Role would you like to delete?',
+            message: 'Which Role would you like to Update?',
             name: 'ID',
             choices: undefined,
           };
           const choices = await newRole.listAll();
           questions.choices = choices;
           const IdAnswer = await inquirer.prompt(questions);
-          const newNameAnswer = await inquirer.prompt([
+          // ask questions about what to change
+          const questions2 = [
             {
               type: 'input',
               message:
-                'What is the new name for the Role? (Enter to not Change)',
-              name: 'newName',
+                'What is the new Title for the Role? (Enter to not Change)',
+              name: 'newTitle',
             },
             {
               type: 'input',
               message:
-                'What is the new name for the Department? (Enter to not Change)',
-              name: 'newName',
+                'What is the new salary for the Role? (ex. 20000.00) (Enter to not Change)',
+              name: 'newSalary',
             },
-          ]);
-          if (newNameAnswer.newName === '') {
-            return await this.manageDepartment();
-          }
-          await newDepartment.update(IdAnswer.ID, {
-            name: newNameAnswer.newName,
+            {
+              type: 'list',
+              message:
+                'What department should this role be changed to?(Enter to not Change)',
+              name: 'newDepartment',
+              choices: [
+                {
+                  name: "Don't Change",
+                  value: 'noChange',
+                },
+              ],
+            },
+          ];
+          const departmentChoices = await newDepartment.listAll();
+          departmentChoices.forEach((choice) => {
+            questions2[2].choices.push(choice);
           });
-          return await this.manageDepartment();
+          const updateRoleAnswer = await inquirer.prompt(questions2);
+          console.log(updateRoleAnswer);
+          const updateRequest = {};
+          if (updateRoleAnswer.newTitle)
+            updateRequest.title = updateRoleAnswer.newTitle;
+          if (updateRoleAnswer.newSalary)
+            updateRequest.salary = updateRoleAnswer.newSalary;
+          if (updateRoleAnswer.newDepartment !== 'noChange')
+            updateRequest.department_id = updateRoleAnswer.newDepartment;
+          console.log(updateRequest);
+          await newRole.update(IdAnswer.ID, updateRequest);
+          return await this.manageRoles();
         } catch (error) {
           console.error(error);
           break;
@@ -337,10 +361,10 @@ const rolePrompt = {
       }
       case 'deleteRole': {
         try {
-          const newDepartment = new Department(dbConfig);
+          const newRole = new Role(dbConfig);
           const questions = {
             type: 'list',
-            message: 'Which Department would you like to delete?',
+            message: 'Which Role would you like to delete?',
             name: 'departmentID',
             choices: undefined,
           };
