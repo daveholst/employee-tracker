@@ -58,9 +58,12 @@ const topLevelPrompt = {
   async next(answers) {
     // switch to detect single function operations. (View)
     switch (answers.task) {
-      case 'viewAll':
+      case 'viewAll': {
         // run a program to pull from print all.
-        break;
+        const newEmployee = new Employee(dbConfig);
+        console.table(await newEmployee.read());
+        return this.generate();
+      }
       case 'viewByDepartment':
         // run a program to print all.
         break;
