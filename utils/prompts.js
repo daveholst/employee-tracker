@@ -2,6 +2,7 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 const Department = require('./departmentClass');
 const Role = require('./roleClass');
+const Employee = require('./employeeClass');
 
 const dbConfig = {
   host: 'localhost',
@@ -37,13 +38,10 @@ const topLevelPrompt = {
           value: 'viewByManager',
         },
         new inquirer.Separator(),
+
         {
-          name: 'Add an Employee',
-          value: 'addEmployee',
-        },
-        {
-          name: 'Modify an Employee',
-          value: 'modEmployee',
+          name: 'Manage Employees',
+          value: 'manEmployee',
         },
         {
           name: 'Manage Departments',
@@ -72,27 +70,20 @@ const topLevelPrompt = {
       case 'viewByManager':
         // run a program to print all.
         break;
-      case 'addEmployee':
-        // run a program to print all.
-        break;
-      case 'modEmployee':
+      case 'manEmployee':
+        await employeePrompt.manageEmployee();
         // run a program to print all.
         break;
       case 'manDepartment': {
         await departmentPrompt.manageDepartment();
-        // const nextResponse = await departmentPrompt.next(response);
-        // // check if user wants to go back?
-        // return nextResponse;
         break;
       }
       case 'manRoles':
         await rolePrompt.manageRoles();
-        // run a program to print all.
         break;
       default:
         console.error('invalid selection made');
     }
-    // switch to detect another inquirer for further options
   },
 };
 
@@ -360,6 +351,198 @@ const rolePrompt = {
         }
       }
       case 'deleteRole': {
+        try {
+          const newRole = new Role(dbConfig);
+          const questions = {
+            type: 'list',
+            message: 'Which Role would you like to delete?',
+            name: 'departmentID',
+            choices: undefined,
+          };
+          const choices = await newRole.listAll();
+          questions.choices = choices;
+          const answer = await inquirer.prompt(questions);
+          await newRole.delete(answer.departmentID);
+          const answer2 = await this.manageRoles();
+          return answer2;
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
+
+      case 'back':
+        topLevelPrompt.generate();
+        break;
+      default:
+        console.error('Something went wrong in selection');
+    }
+  },
+};
+
+const employeePrompt = {
+  async manageEmployee() {
+    const answers = await inquirer.prompt({
+      type: 'list',
+      message: 'What would you like to do with Employees?',
+      name: 'task',
+      choices: [
+        {
+          name: 'View All Employees',
+          value: 'viewAllEmployees',
+        },
+        {
+          name: 'Add an Employee',
+          value: 'addEmployee',
+        },
+        {
+          name: 'Update an Employee',
+          value: 'updateEmployee',
+        },
+        {
+          name: 'Delete an Employee',
+          value: 'deleteEmployee',
+        },
+        {
+          name: 'Back',
+          value: 'back',
+        },
+      ],
+    });
+    this.next(answers);
+    // console.log(answers);
+  },
+
+  async next(answers) {
+    switch (answers.task) {
+      case 'viewAllEmployees': {
+        // run a program to pull from print all.
+        const newEmployee = new Employee(dbConfig);
+        const allEmployees = await newEmployee.read();
+        console.table(allEmployees);
+        const answer = await this.manageEmployee();
+        return answer;
+      }
+      case 'addEmployee': {
+        try {
+          const questions = [
+            {
+              type: 'input',
+              message: 'What is the First Name of the Employee?',
+              name: 'employeeFirstName',
+            },
+            {
+              type: 'input',
+              message: 'What is the Last Name of the Employee?',
+              name: 'employeeLastName',
+            },
+            {
+              type: 'list',
+              message: 'What Role is the Employee assigned to?',
+              name: 'roleId',
+              choices: undefined,
+            },
+            {
+              type: 'list',
+              message: "Who is the Employee's Manager (Enter for No Manager)",
+              name: 'managerId',
+              choices: [
+                {
+                  name: 'No Manager',
+                  value: '',
+                },
+              ],
+            },
+          ];
+          // get role inquirer questions array
+          const newRole = new Role(dbConfig);
+          const roleChoices = await newRole.listAll();
+          questions[2].choices = roleChoices;
+          // get manager inquirer questions
+          const newEmployee = new Employee(dbConfig);
+          const managerChoices = await newEmployee.listAll();
+          managerChoices.forEach((employee) => {
+            questions[3].choices.push(employee);
+          });
+          const answer = await inquirer.prompt(questions);
+          // const newRole = new Role(dbConfig);
+          await newEmployee.create(
+            answer.employeeFirstName,
+            answer.employeeLastName,
+            answer.roleId,
+            answer.managerId ? answer.managerId : null
+          );
+          // redraw menu when finished
+          const answer2 = await this.manageEmployee();
+          return answer2;
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
+      case 'updateEmployee': {
+        try {
+          // get list of Roles to select from
+          const newRole = new Role(dbConfig);
+          const newDepartment = new Department(dbConfig);
+          const questions = {
+            type: 'list',
+            message: 'Which Role would you like to Update?',
+            name: 'ID',
+            choices: undefined,
+          };
+          const choices = await newRole.listAll();
+          questions.choices = choices;
+          const IdAnswer = await inquirer.prompt(questions);
+          // ask questions about what to change
+          const questions2 = [
+            {
+              type: 'input',
+              message:
+                'What is the new Title for the Role? (Enter to not Change)',
+              name: 'newTitle',
+            },
+            {
+              type: 'input',
+              message:
+                'What is the new salary for the Role? (ex. 20000.00) (Enter to not Change)',
+              name: 'newSalary',
+            },
+            {
+              type: 'list',
+              message:
+                'What department should this role be changed to?(Enter to not Change)',
+              name: 'newDepartment',
+              choices: [
+                {
+                  name: "Don't Change",
+                  value: 'noChange',
+                },
+              ],
+            },
+          ];
+          const departmentChoices = await newDepartment.listAll();
+          departmentChoices.forEach((choice) => {
+            questions2[2].choices.push(choice);
+          });
+          const updateRoleAnswer = await inquirer.prompt(questions2);
+          console.log(updateRoleAnswer);
+          const updateRequest = {};
+          if (updateRoleAnswer.newTitle)
+            updateRequest.title = updateRoleAnswer.newTitle;
+          if (updateRoleAnswer.newSalary)
+            updateRequest.salary = updateRoleAnswer.newSalary;
+          if (updateRoleAnswer.newDepartment !== 'noChange')
+            updateRequest.department_id = updateRoleAnswer.newDepartment;
+          console.log(updateRequest);
+          await newRole.update(IdAnswer.ID, updateRequest);
+          return await this.manageRoles();
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
+      case 'deleteEmployee': {
         try {
           const newRole = new Role(dbConfig);
           const questions = {
