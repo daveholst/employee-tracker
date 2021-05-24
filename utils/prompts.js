@@ -12,83 +12,6 @@ const dbConfig = {
   database: 'hr_employees',
 };
 
-const topLevelPrompt = {
-  async generate() {
-    const answers = await inquirer.prompt({
-      type: 'list',
-      message: 'What would you like to do?',
-      name: 'task',
-      choices: [
-        {
-          name: 'View All Employees',
-          value: 'viewAll',
-        },
-        {
-          name: 'View Employees by Department',
-          value: 'viewByDepartment',
-        },
-        {
-          name: 'View Employees by Role',
-          value: 'viewByRole',
-        },
-        {
-          name: 'View Employees by Manager',
-          value: 'viewByManager',
-        },
-        new inquirer.Separator(),
-
-        {
-          name: 'Manage Employees',
-          value: 'manEmployee',
-        },
-        {
-          name: 'Manage Departments',
-          value: 'manDepartment',
-        },
-        {
-          name: 'Manage Roles',
-          value: 'manRoles',
-        },
-        new inquirer.Separator(),
-      ],
-    });
-    this.next(answers);
-  },
-  async next(answers) {
-    // switch to detect single function operations. (View)
-    switch (answers.task) {
-      case 'viewAll': {
-        // run a program to pull from print all.
-        const newEmployee = new Employee(dbConfig);
-        console.table(await newEmployee.read());
-        return this.generate();
-      }
-      case 'viewByDepartment':
-        // run a program to print all.
-        break;
-      case 'viewByRole':
-        // run a program to print all.
-        break;
-      case 'viewByManager':
-        // run a program to print all.
-        break;
-      case 'manEmployee':
-        await employeePrompt.manageEmployee();
-        // run a program to print all.
-        break;
-      case 'manDepartment': {
-        await departmentPrompt.manageDepartment();
-        break;
-      }
-      case 'manRoles':
-        await rolePrompt.manageRoles();
-        break;
-      default:
-        console.error('invalid selection made');
-    }
-  },
-};
-
 const departmentPrompt = {
   async manageDepartment() {
     const answers = await inquirer.prompt({
@@ -325,7 +248,7 @@ const rolePrompt = {
               name: 'newDepartment',
               choices: [
                 {
-                  name: "Don't Change",
+                  name: "** Don't Change **",
                   value: 'noChange',
                 },
               ],
@@ -412,7 +335,6 @@ const employeePrompt = {
       ],
     });
     this.next(answers);
-    // console.log(answers);
   },
 
   async next(answers) {
@@ -594,4 +516,121 @@ const employeePrompt = {
   },
 };
 
-module.exports = { topLevelPrompt, departmentPrompt };
+const topLevelPrompt = {
+  async generate() {
+    const answers = await inquirer.prompt({
+      type: 'list',
+      message: 'What would you like to do?',
+      name: 'task',
+      choices: [
+        {
+          name: 'View All Employees',
+          value: 'viewAll',
+        },
+        {
+          name: 'View Employees by Department',
+          value: 'viewByDepartment',
+        },
+        {
+          name: 'View Employees by Role',
+          value: 'viewByRole',
+        },
+        {
+          name: 'View Employees by Manager',
+          value: 'viewByManager',
+        },
+        new inquirer.Separator(),
+
+        {
+          name: 'Manage Employees',
+          value: 'manEmployee',
+        },
+        {
+          name: 'Manage Departments',
+          value: 'manDepartment',
+        },
+        {
+          name: 'Manage Roles',
+          value: 'manRoles',
+        },
+        new inquirer.Separator(),
+      ],
+    });
+    this.next(answers);
+  },
+  async next(answers) {
+    // switch to detect single function operations. (View)
+    switch (answers.task) {
+      case 'viewAll': {
+        // run a program to pull from print all.
+        const newEmployee = new Employee(dbConfig);
+        console.table(await newEmployee.read());
+        return this.generate();
+      }
+      case 'viewByDepartment':
+        // run a program to print all.
+        await viewByDepartmentPrompt.generate();
+        break;
+      case 'viewByRole':
+        await viewByRolePrompt.generate();
+        // run a program to print all.
+        break;
+      case 'viewByManager':
+        // run a program to print all.
+        break;
+      case 'manEmployee':
+        await employeePrompt.manageEmployee();
+        // run a program to print all.
+        break;
+      case 'manDepartment': {
+        await departmentPrompt.manageDepartment();
+        break;
+      }
+      case 'manRoles':
+        await rolePrompt.manageRoles();
+        break;
+      default:
+        console.error('invalid selection made');
+    }
+  },
+};
+
+const viewByDepartmentPrompt = {
+  async generate() {
+    // select a department
+    const newDepartment = new Department(dbConfig);
+    const newEmployee = new Employee(dbConfig);
+    // const choices = await newDepartment.listAll();
+    const departmentChoice = await inquirer.prompt({
+      type: 'list',
+      message: 'Which Department?',
+      name: 'department',
+      choices: await newDepartment.listAll(),
+    });
+    // print the results of that department
+    console.log(departmentChoice);
+    console.table(
+      await newEmployee.readByDepartment(departmentChoice.department)
+    );
+    return topLevelPrompt.generate();
+  },
+};
+const viewByRolePrompt = {
+  async generate() {
+    // select a department
+    const newRole = new Role(dbConfig);
+    const newEmployee = new Employee(dbConfig);
+    // const choices = await newDepartment.listAll();
+    const roleChoice = await inquirer.prompt({
+      type: 'list',
+      message: 'Which Role?',
+      name: 'role',
+      choices: await newRole.listAll(),
+    });
+    // print the results of that department
+    console.log(roleChoice);
+    console.table(await newEmployee.readByRole(roleChoice.role));
+    return topLevelPrompt.generate();
+  },
+};
+module.exports = { topLevelPrompt };
