@@ -19,8 +19,6 @@ const topLevelPrompt = {
       message: 'What would you like to do?',
       name: 'task',
       choices: [
-        new inquirer.Separator(),
-
         {
           name: 'View All Employees',
           value: 'viewAll',
@@ -51,6 +49,7 @@ const topLevelPrompt = {
           name: 'Manage Roles',
           value: 'manRoles',
         },
+        new inquirer.Separator(),
       ],
     });
     this.next(answers);
@@ -485,16 +484,16 @@ const employeePrompt = {
       }
       case 'updateEmployee': {
         try {
-          // get list of Roles to select from
+          // get list of Employees to select from
           const newRole = new Role(dbConfig);
-          const newDepartment = new Department(dbConfig);
+          const newEmployee = new Employee(dbConfig);
           const questions = {
             type: 'list',
-            message: 'Which Role would you like to Update?',
+            message: 'Which Employee would you like to Update?',
             name: 'ID',
             choices: undefined,
           };
-          const choices = await newRole.listAll();
+          const choices = await newEmployee.listAll();
           questions.choices = choices;
           const IdAnswer = await inquirer.prompt(questions);
           // ask questions about what to change
@@ -502,44 +501,64 @@ const employeePrompt = {
             {
               type: 'input',
               message:
-                'What is the new Title for the Role? (Enter to not Change)',
-              name: 'newTitle',
+                'What is the new First Name for the Employee? (Enter to not Change)',
+              name: 'newFirstName',
             },
             {
               type: 'input',
               message:
-                'What is the new salary for the Role? (ex. 20000.00) (Enter to not Change)',
-              name: 'newSalary',
+                'What is the new Last Name for the Employee? (Enter to not Change)',
+              name: 'newLastName',
             },
             {
               type: 'list',
               message:
-                'What department should this role be changed to?(Enter to not Change)',
-              name: 'newDepartment',
+                'What Role should the Employee be changed to?(Enter to not Change)',
+              name: 'newRole',
               choices: [
                 {
-                  name: "Don't Change",
-                  value: 'noChange',
+                  name: "** Don't Change **",
+                  value: '',
+                },
+              ],
+            },
+            {
+              type: 'list',
+              message:
+                'What Manager should the Employee be changed to?(Enter to not Change)',
+              name: 'newManager',
+              choices: [
+                {
+                  name: "** Don't Change ** ",
+                  value: '',
                 },
               ],
             },
           ];
-          const departmentChoices = await newDepartment.listAll();
-          departmentChoices.forEach((choice) => {
+          // get role choices
+          const roleChoices = await newRole.listAll();
+          roleChoices.forEach((choice) => {
             questions2[2].choices.push(choice);
+          });
+          // get manager choices
+          const managerChoices = await newEmployee.listAll();
+          managerChoices.forEach((choice) => {
+            questions2[3].choices.push(choice);
           });
           const updateRoleAnswer = await inquirer.prompt(questions2);
           console.log(updateRoleAnswer);
           const updateRequest = {};
-          if (updateRoleAnswer.newTitle)
-            updateRequest.title = updateRoleAnswer.newTitle;
-          if (updateRoleAnswer.newSalary)
-            updateRequest.salary = updateRoleAnswer.newSalary;
-          if (updateRoleAnswer.newDepartment !== 'noChange')
-            updateRequest.department_id = updateRoleAnswer.newDepartment;
+          if (updateRoleAnswer.newFirstName)
+            updateRequest.first_name = updateRoleAnswer.newFirstName;
+          if (updateRoleAnswer.newLastName)
+            updateRequest.last_name = updateRoleAnswer.newLastName;
+          if (updateRoleAnswer.newRole)
+            updateRequest.role_id = updateRoleAnswer.newRole;
+          if (updateRoleAnswer.newManager)
+            updateRequest.manager_id = updateRoleAnswer.newManager;
           console.log(updateRequest);
-          await newRole.update(IdAnswer.ID, updateRequest);
-          return await this.manageRoles();
+          await newEmployee.update(IdAnswer.ID, updateRequest);
+          return await this.manageEmployee();
         } catch (error) {
           console.error(error);
           break;

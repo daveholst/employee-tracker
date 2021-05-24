@@ -70,7 +70,10 @@ class Employee {
   async update(id = this.id, dataObject) {
     try {
       const connection = await mysql.createConnection(this.dbConfig);
-      await connection.query('UPDATE roles SET ? WHERE id=?', [dataObject, id]);
+      await connection.query('UPDATE employee SET ? WHERE id=?', [
+        dataObject,
+        id,
+      ]);
       connection.end();
     } catch (error) {
       console.error(error);
