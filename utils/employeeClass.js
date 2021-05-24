@@ -84,7 +84,7 @@ class Employee {
   async delete(id = this.id) {
     try {
       const connection = await mysql.createConnection(this.dbConfig);
-      await connection.query(`DELETE FROM department WHERE id=${id}`);
+      await connection.query(`DELETE FROM employee WHERE id=${id}`);
       connection.end();
     } catch (error) {
       console.error(error);

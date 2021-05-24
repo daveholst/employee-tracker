@@ -566,18 +566,18 @@ const employeePrompt = {
       }
       case 'deleteEmployee': {
         try {
-          const newRole = new Role(dbConfig);
+          const newEmployee = new Employee(dbConfig);
           const questions = {
             type: 'list',
-            message: 'Which Role would you like to delete?',
-            name: 'departmentID',
+            message: 'Which Employee would you like to delete?',
+            name: 'employeeID',
             choices: undefined,
           };
-          const choices = await newRole.listAll();
+          const choices = await newEmployee.listAll();
           questions.choices = choices;
           const answer = await inquirer.prompt(questions);
-          await newRole.delete(answer.departmentID);
-          const answer2 = await this.manageRoles();
+          await newEmployee.delete(answer.employeeID);
+          const answer2 = await this.manageEmployee();
           return answer2;
         } catch (error) {
           console.error(error);
