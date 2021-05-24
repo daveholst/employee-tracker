@@ -100,6 +100,23 @@ class Employee {
     }
   }
 
+  async readByManager(id) {
+    try {
+      const connection = await mysql.createConnection(this.dbConfig);
+      const query = await connection.query(
+        `SELECT employee.id, employee.first_name, employee.last_name,roles.title,roles.salary,department.department_name
+        FROM employee
+          INNER JOIN roles ON employee.role_id = roles.id
+          INNER JOIN department ON department.id = roles.department_id
+          WHERE manager_id = ${id};`
+      );
+      connection.end();
+      return query[0];
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   // updates a department entry - takes changes as an object
   async update(id = this.id, dataObject) {
     try {

@@ -576,6 +576,7 @@ const topLevelPrompt = {
         // run a program to print all.
         break;
       case 'viewByManager':
+        await viewByManagerPrompt.generate();
         // run a program to print all.
         break;
       case 'manEmployee':
@@ -608,7 +609,6 @@ const viewByDepartmentPrompt = {
       choices: await newDepartment.listAll(),
     });
     // print the results of that department
-    console.log(departmentChoice);
     console.table(
       await newEmployee.readByDepartment(departmentChoice.department)
     );
@@ -628,8 +628,23 @@ const viewByRolePrompt = {
       choices: await newRole.listAll(),
     });
     // print the results of that department
-    console.log(roleChoice);
     console.table(await newEmployee.readByRole(roleChoice.role));
+    return topLevelPrompt.generate();
+  },
+};
+const viewByManagerPrompt = {
+  async generate() {
+    // select a department
+    const newEmployee = new Employee(dbConfig);
+    // const choices = await newDepartment.listAll();
+    const roleChoice = await inquirer.prompt({
+      type: 'list',
+      message: 'Which Manager?',
+      name: 'manager',
+      choices: await newEmployee.listAll(),
+    });
+    // print the results of that department
+    console.table(await newEmployee.readByManager(roleChoice.manager));
     return topLevelPrompt.generate();
   },
 };
