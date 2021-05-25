@@ -75,7 +75,7 @@ class Role {
   async delete(id = this.id) {
     try {
       const connection = await mysql.createConnection(this.dbConfig);
-      await connection.query(`DELETE FROM department WHERE id=${id}`);
+      await connection.query(`DELETE FROM roles WHERE id=${id}`);
       connection.end();
     } catch (error) {
       console.error(error);

@@ -12,7 +12,6 @@ class Employee {
 
   // create new department on DB
   async create(first, last, role, manager) {
-    console.log(manager);
     try {
       const connection = await mysql.createConnection(this.dbConfig);
       const query = await connection.query('INSERT INTO employee SET ?', {

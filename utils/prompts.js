@@ -291,6 +291,7 @@ const employeePrompt = {
             questions2[2].choices.push(choice);
           });
           // get manager choices
+
           const managerChoices = await newEmployee.listAll();
           managerChoices.forEach((choice) => {
             questions2[3].choices.push(choice);
@@ -303,7 +304,10 @@ const employeePrompt = {
             updateRequest.last_name = updateRoleAnswer.newLastName;
           if (updateRoleAnswer.newRole)
             updateRequest.role_id = updateRoleAnswer.newRole;
-          if (updateRoleAnswer.newManager)
+          if (
+            updateRoleAnswer.newManager ||
+            updateRoleAnswer.newManager === null
+          )
             updateRequest.manager_id = updateRoleAnswer.newManager;
           await newEmployee.update(IdAnswer.ID, updateRequest);
           return await this.manageEmployee();

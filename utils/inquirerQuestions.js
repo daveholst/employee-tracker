@@ -121,7 +121,7 @@ const inquirerQ = {
       name: 'managerId',
       choices: [
         {
-          name: 'No Manager',
+          name: '** No Manager **',
           value: '',
         },
       ],
@@ -161,6 +161,10 @@ const inquirerQ = {
         {
           name: "** Don't Change ** ",
           value: '',
+        },
+        {
+          name: '** No Manager **',
+          value: null,
         },
       ],
     },
