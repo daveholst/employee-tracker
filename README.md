@@ -31,7 +31,7 @@ This project is licensed under the **MIT License**: https://opensource.org/licen
 
 ## YouTube Demo
 
-A recorded demo of this app is hosted on youTube at https://sleepy-fjord-84499.herokuapp.com/
+A recorded demo of this app is hosted on youTube at: https://youtu.be/shkI3ukdQ6U
 
 ## Technology Stack
 
