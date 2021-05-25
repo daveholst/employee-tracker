@@ -4,14 +4,7 @@ const Department = require('./departmentClass');
 const Role = require('./roleClass');
 const Employee = require('./employeeClass');
 const inquirerQ = require('./inquirerQuestions');
-
-const dbConfig = {
-  host: 'localhost',
-  port: 6606,
-  user: 'dave',
-  password: 'password',
-  database: 'hr_employees',
-};
+const dbConfig = require('./dbConfig');
 
 const departmentPrompt = {
   async manageDepartment() {
