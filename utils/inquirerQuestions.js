@@ -165,6 +165,38 @@ const inquirerQ = {
       ],
     },
   ],
+  departmentPrompt: {
+    type: 'list',
+    message: 'What would you like to do with Departments?',
+    name: 'task',
+    choices: [
+      {
+        name: 'View All Departments',
+        value: 'viewAllDepartments',
+      },
+      {
+        name: 'View Departments by Cost',
+        value: 'viewAllByCost',
+      },
+      {
+        name: 'Add a Department',
+        value: 'addADepartment',
+      },
+      {
+        name: 'Update a Department',
+        value: 'updateDepartment',
+      },
+      {
+        name: 'Delete a Department',
+        value: 'deleteDepartment',
+      },
+      {
+        name: 'Back',
+        value: 'back',
+      },
+    ],
+  },
+
   topLevel: {
     type: 'list',
     message: 'What would you like to do?',

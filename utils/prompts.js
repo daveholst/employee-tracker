@@ -8,33 +8,7 @@ const dbConfig = require('./dbConfig');
 
 const departmentPrompt = {
   async manageDepartment() {
-    const answers = await inquirer.prompt({
-      type: 'list',
-      message: 'What would you like to do with Departments?',
-      name: 'task',
-      choices: [
-        {
-          name: 'View All Departments',
-          value: 'viewAllDepartments',
-        },
-        {
-          name: 'Add a Department',
-          value: 'addADepartment',
-        },
-        {
-          name: 'Update a Department',
-          value: 'updateDepartment',
-        },
-        {
-          name: 'Delete a Department',
-          value: 'deleteDepartment',
-        },
-        {
-          name: 'Back',
-          value: 'back',
-        },
-      ],
-    });
+    const answers = await inquirer.prompt(inquirerQ.departmentPrompt);
     this.next(answers);
   },
 
@@ -47,6 +21,34 @@ const departmentPrompt = {
         console.table(allDepartments);
         return this.manageDepartment();
       }
+      case 'viewAllByCost': {
+        try {
+          // get all departments codes, build an object
+          const totals = [];
+          const newEmployee = new Employee(dbConfig);
+          const allEmployees = await newEmployee.read();
+          allEmployees.forEach((employee) => {
+            // find department index
+            const foundIndex = totals.findIndex(
+              (e) => e.department_name === employee.department_name
+            );
+            if (foundIndex === -1) {
+              totals.push({
+                department_name: employee.department_name,
+                total_spent: Number(employee.salary),
+              });
+            } else {
+              totals[foundIndex].total_spent += Number(employee.salary);
+            }
+          });
+          console.table(totals);
+          return this.manageDepartment();
+        } catch (error) {
+          console.error(error);
+          break;
+        }
+      }
+
       case 'addADepartment': {
         try {
           const answer = await inquirer.prompt({
